@@ -146,7 +146,15 @@ function findAriaFilePath (files) {
  * @param {Object[]} files The list of files in the download
  * @returns {Object} An object containing a printable status message and the file name
  */
-function generateStatusMessage (totalLength, completedLength, speed, files) {
+function generateStatusMessage (files, isActive, totalLength, completedLength, speed) {
+  if (isActive) {
+    return generateActiveStatusMessage(files, totalLength, completedLength, speed);
+  } else {
+    return generateInactiveStatusMessage(files);
+  }
+}
+
+function generateActiveStatusMessage (files, totalLength, completedLength, speed) {
   var fileName = findAriaFilePath(files);
   fileName = getFileNameFromPath(fileName);
   var progress;
@@ -164,6 +172,17 @@ function generateStatusMessage (totalLength, completedLength, speed, files) {
     message: message,
     filename: fileName,
     filesize: totalLengthStr
+  };
+  return status;
+}
+
+function generateInactiveStatusMessage (files) {
+  var fileName = findAriaFilePath(files);
+  fileName = getFileNameFromPath(fileName);
+  var message = `<i>${fileName}</i><code>Queued</code>`;
+  var status = {
+    message: message,
+    filename: fileName
   };
   return status;
 }

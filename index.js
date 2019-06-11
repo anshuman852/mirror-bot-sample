@@ -93,20 +93,17 @@ function getStatus (msg, callback) {
   }
 
   if (authorizedCode > -1) {
-    if (dlVars.isDownloading) {
-      if (dlVars.isUploading) {
-        callback(null, 'Upload in progress.');
-      } else {
-        ariaTools.getStatus(dlVars.downloadGid, (err, message, filename, filesize) => {
-          if (!err) {
-            handleDisallowedFilename(filename);
-            callback(null, message);
-          } else {
-            console.log('status: ', err);
-            callback(err, null);
-          }
-        });
-      }
+    if (dlManager.getAllDlCount() > 0) {
+      // TODO: Manage "Uploading" messages
+      ariaTools.getStatus(dlManager.allDownloads, (err, message) => {
+        if (!err) {
+          handleDisallowedFilename(filename);
+          callback(null, message);
+        } else {
+          console.log('status: ', err);
+          callback(err, null);
+        }
+      });
     } else {
       callback(null, 'No active downloads');
     }

@@ -65,33 +65,37 @@ function getAriaFilePath (gid, callback) {
 }
 
 /**
- * Get a human-readable message about the status of the given download. Uses
- * HTML markup. Filename and filesize is always present if the download exists,
- * message is only present if the download is active.
- * @param {string} gid The Aria2 GID of the download
- * @param {function} callback The function to call on completion. (err, message, filename, filesize).
+ * Get a human-readable message about the status of all downloads. Uses
+ * HTML markup.
+ * @param {Object} allDownloads An object containing details of all (active + inactive) downloads
+ * @param {function} callback The function to call on completion. (err, message).
  */
-function getStatus (gid, callback) {
-  aria2.tellStatus(gid,
-    ['status', 'totalLength', 'completedLength', 'downloadSpeed', 'files'],
-    (err, res) => {
-      var isActive;
-      if (err) {
-        callback(err);
-        console.log('ERROR:', err);
-        return;
-      } else if (res['status'] === 'active') {
-        isActive = true;
+function getStatus (allDownloads, callback) {
+  Object.keys(allDownloads).forEach(gid => {
+    aria2.tellStatus(gid, ['status', 'totalLength', 'completedLength', 'downloadSpeed', 'files'],
+      (err, res) => {
+        var isActive;
+        var isQueued;
+        if (err) {
+          callback(err);
+          console.log('ERROR:', err);
+          return;
+        } else if (res['status'] === 'active') {
+          isActive = true;
+        } else if (res['status'] === 'waiting') {
+          isQueued = true;
+        }
+        var statusMessage;
+        if (isActive) {
+          statusMessage = downloadUtils.generateStatusMessage(res['files'], true, parseFloat(res['totalLength']),
+            parseFloat(res['completedLength']), parseFloat(res['downloadSpeed']));
+        } else if (isQueued) {
+          statusMessage = downloadUtils.generateStatusMessage(res['files'], false);
+        }
+        callback(null, statusMessage.message);
       }
-      var statusMessage = downloadUtils.generateStatusMessage(parseFloat(res['totalLength']),
-        parseFloat(res['completedLength']),
-        parseFloat(res['downloadSpeed']),
-        res['files']);
-      if (!isActive) {
-        statusMessage.message = 'No active downloads.';
-      }
-      callback(null, statusMessage.message, statusMessage.filename, statusMessage.filesize);
-    });
+    );
+  });
 }
 
 function isDownloadMetadata (gid, callback) {

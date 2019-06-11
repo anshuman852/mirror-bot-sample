@@ -39,8 +39,8 @@ function deleteDownload (gid) {
   delete allDownloads[gid];
 }
 
-function getActiveDlCount () {
-  return Object.keys(activeDownloads).length;
+function getAllDlCount () {
+  return Object.keys(allDownloads).length;
 }
 
 /**
@@ -60,4 +60,4 @@ module.exports.makeDownloadActive = makeDownloadActive;
 module.exports.deleteDownload = deleteDownload;
 module.exports.allDownloads = allDownloads;
 module.exports.activeDownloads = activeDownloads;
-module.exports.getActiveDlCount = getActiveDlCount;
+module.exports.getAllDlCount = getAllDlCount;
