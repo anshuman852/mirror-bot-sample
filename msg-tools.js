@@ -1,4 +1,4 @@
-const dlVars = require('./download_tools/vars.js');
+const dlVars = require('./download_tools/download_list/dl-detail.js');
 const constants = require('./.constants.js');
 const http = require('http');
 const ariaTools = require('./download_tools/aria-tools.js');

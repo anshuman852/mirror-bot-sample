@@ -1,6 +1,6 @@
 const TelegramBot = require('node-telegram-bot-api');
 const downloadUtils = require('./download_tools/utils.js');
-const dlVars = require('./download_tools/vars.js');
+const dlManager = require('./download_tools/download_list/dl-manager.js');
 const ariaTools = require('./download_tools/aria-tools.js');
 const constants = require('./.constants.js');
 const msgTools = require('./msg-tools.js');
@@ -40,8 +40,8 @@ bot.onText(/^\/mirror (.+)/i, (msg, match) => {
   }
 });
 
-bot.on('message', (msg) => {
-  if (dlVars.isDownloading && msg.chat.id === dlVars.tgChatId) {
+/* bot.on('message', (msg) => {
+  if (dlManager.getActiveDlCount === 0 && msg.chat.id === dlVars.tgChatId) {
     if (dlVars.messagesSinceStart) {
       if (dlVars.messagesSinceStart < 10) {
         dlVars.messagesSinceStart++;
@@ -50,7 +50,7 @@ bot.on('message', (msg) => {
       dlVars.messagesSinceStart = 1;
     }
   }
-});
+}); */
 
 /**
  * Start a new download operation. Only one is allowed at a time. Make sure
@@ -62,15 +62,15 @@ bot.on('message', (msg) => {
  */
 function mirror (msg, match, isTar) {
   if (websocketOpened) {
-    if (dlVars.isDownloading) {
-      sendMessage(msg, dlVars.tgUsername + ' is mirroring something. Please wait.');
+    // if (dlVars.isDownloading) {
+    //  sendMessage(msg, dlVars.tgUsername + ' is mirroring something. Please wait.');
+    // } else {
+    if (downloadUtils.isDownloadAllowed(match[1])) {
+      prepDownload(msg, match[1], isTar);
     } else {
-      if (downloadUtils.isDownloadAllowed(match[1])) {
-        prepDownload(msg, match[1], isTar);
-      } else {
-        sendMessage(msg, `Download failed. Blacklisted URL.`);
-      }
+      sendMessage(msg, `Download failed. Blacklisted URL.`);
     }
+    // }
   } else {
     sendMessage(msg, `Websocket isn't open. Can't download`);
   }
@@ -208,22 +208,18 @@ function handleDisallowedFilename (filename) {
 }
 
 function prepDownload (msg, match, isTar) {
-  sendMessage(msg, 'Preparing', -1, statusMessage => {
-    downloadUtils.setDownloadVars(msg, statusMessage, isTar);
-    download(match);
-  });
-}
-
-function download (match) {
   ariaTools.addUri([match],
     (err, gid) => {
       if (err) {
         console.log('Failure', err);
-        sendMessageReplyOriginal(`Failed to start the download. ${err['message']}`);
-        statusInterval = null;
-        msgTools.notifyExternal(false, gid, dlVars.tgChatId);
-        downloadUtils.cleanupDownload();
+        sendMessageReplyOriginal(msg.chat.id, msg.message_id, `Failed to start the download. ${err['message']}`);
+        // statusInterval = null;
+        msgTools.notifyExternal(false, gid, msg.chat.id);
+        downloadUtils.cleanupDownload(); // !!!!
       } else {
+        sendMessage(msg, 'Preparing', -1, statusMessage => {
+          dlManager.addDownload(gid, msg, statusMessage, isTar);
+        });
         console.log(`download:${match} gid:${gid}`);
       }
     });
@@ -253,9 +249,9 @@ function sendUnauthorizedMessage (msg) {
   sendMessage(msg, `You aren't authorized to use this bot here.`);
 }
 
-function sendMessageReplyOriginal (message) {
-  bot.sendMessage(dlVars.tgChatId, message, {
-    reply_to_message_id: dlVars.tgMessageId,
+function sendMessageReplyOriginal (chatId, commandMsgId, message) {
+  bot.sendMessage(chatId, message, {
+    reply_to_message_id: commandMsgId,
     parse_mode: 'HTML'
   })
     .catch((ignored) => { });

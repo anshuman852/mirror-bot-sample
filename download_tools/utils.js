@@ -1,5 +1,5 @@
 const fs = require('fs-extra');
-const dlVars = require('./vars.js');
+const dlVars = require('./download_list/dl-detail.js');
 const constants = require('../.constants.js');
 
 const TYPE_METADATA = 'Metadata';
@@ -28,7 +28,7 @@ function cleanupDownload () {
     });
 }
 
-function resetVars () {
+/* function resetVars () {
   dlVars.isDownloading = undefined;
   dlVars.isUploading = undefined;
   dlVars.statusMsgsList = [];
@@ -36,7 +36,7 @@ function resetVars () {
   dlVars.isDownloadAllowed = undefined;
   dlVars.fileSize = undefined;
   dlVars.filename = undefined;
-}
+} */
 
 /**
  * Given the path to a file in the download directory, returns
@@ -60,7 +60,7 @@ function getFileNameFromPath (filePath) {
   return fileName;
 }
 
-function setDownloadVars (msg, statusMsg, isTar) {
+/* function setDownloadVars (msg, statusMsg, isTar) {
   dlVars.isDownloading = true;
   dlVars.isTar = isTar;
   dlVars.tgFromId = msg.from.id;
@@ -80,7 +80,7 @@ function setDownloadVars (msg, statusMsg, isTar) {
     },
     from: {id: statusMsg.from.id}
   });
-}
+} */
 
 /**
  * Checks if the given chat already has a status message.
@@ -219,7 +219,7 @@ function isFilenameAllowed (filename) {
 
 module.exports.cleanupDownload = cleanupDownload;
 module.exports.getFileNameFromPath = getFileNameFromPath;
-module.exports.setDownloadVars = setDownloadVars;
+// module.exports.setDownloadVars = setDownloadVars;
 module.exports.findAriaFilePath = findAriaFilePath;
 module.exports.generateStatusMessage = generateStatusMessage;
 module.exports.isDownloadAllowed = isDownloadAllowed;
