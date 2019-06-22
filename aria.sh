@@ -1,0 +1,2 @@
+aria2c --enable-rpc --rpc-listen-all=false --rpc-listen-port 8210 --max-concurrent-downloads=1 --max-connection-per-server=10 --rpc-max-request-size=1024M --seed-time=1 --min-split-size=10M --follow-torrent=mem --split=10 --rpc-secret=9hGB33y540sQ27U --daemon=true
+npm start
