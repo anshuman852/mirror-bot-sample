@@ -1,8 +1,8 @@
 module.exports = Object.freeze({
   TOKEN: 'bot_token',
-  ARIA_SECRET: 'aria2_secret',
-  ARIA_DOWNLOAD_LOCATION: '/home/user/path/to/download/dir (no trailing "/")',
-  ARIA_DOWNLOAD_LOCATION_ROOT: '/', //The mountpoint that contains ARIA_DOWNLOAD_LOCATION
+  ARIA_SECRET: '9hGB33y540sQ27U',
+  ARIA_DOWNLOAD_LOCATION: '/app/downloads',
+  ARIA_DOWNLOAD_LOCATION_ROOT: '/app', //The mountpoint that contains ARIA_DOWNLOAD_LOCATION
   ARIA_FILTERED_DOMAINS: ['yts', 'YTS', 'cruzing.xyz', 'eztv.ag', 'YIFY'], // Prevent downloading from URLs containing these substrings
   ARIA_FILTERED_FILENAMES: ['YIFY'], // Files/top level directories with these substrings in the filename won't be downloaded
   GDRIVE_PARENT_DIR_ID: 'id_of_Drive_folder_to_upload_into',
